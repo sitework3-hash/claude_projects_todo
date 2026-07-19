@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateTransactionCommand } from '../contracts/create-transaction.command';
 import { DeleteTransactionCommand } from '../contracts/delete-transaction.command';
+import { GetLatestTransactionsQuery } from '../contracts/get-latest-transactions.query';
 import { GetTransactionByIdQuery } from '../contracts/get-transaction-by-id.query';
 import { GetTransactionsQuery } from '../contracts/get-transactions.query';
 import { GetUserByIdQuery } from '../contracts/get-user-by-id.query';
@@ -36,6 +37,12 @@ export class TransactionsService {
   findAll(userId: string, month?: number, year?: number): Promise<TransactionsSummaryDto> {
     return this.queryBus.execute<GetTransactionsQuery, TransactionsSummaryDto>(
       new GetTransactionsQuery(userId, month, year),
+    );
+  }
+
+  findLatest(userId: string, limit: number, offset: number): Promise<TransactionDto[]> {
+    return this.queryBus.execute<GetLatestTransactionsQuery, TransactionDto[]>(
+      new GetLatestTransactionsQuery(userId, limit, offset),
     );
   }
 
