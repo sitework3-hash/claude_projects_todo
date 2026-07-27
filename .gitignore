@@ -43,3 +43,6 @@ Thumbs.db
 
 # Временный файл с GitHub-токеном (никогда не коммитить)
 /.gh-token
+
+# Claude Code — memory для этого проекта (локально, не для git)
+/.claude/memory/
