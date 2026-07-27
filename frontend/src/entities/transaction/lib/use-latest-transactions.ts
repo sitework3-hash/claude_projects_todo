@@ -25,7 +25,9 @@ export function useLatestTransactions(): UseLatestTransactionsResult {
   const loadPage = useCallback((currentOffset: number) => {
     getLatestTransactions({ limit: PAGE_SIZE, offset: currentOffset })
       .then((data) => {
-        setTransactions((prev) => [...prev, ...data]);
+        setTransactions((prev) =>
+          currentOffset === 0 ? data : [...prev, ...data],
+        );
         setHasMore(data.length === PAGE_SIZE);
       })
       .catch(() => {
