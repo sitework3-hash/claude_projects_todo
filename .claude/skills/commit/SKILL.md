@@ -1,7 +1,10 @@
 ---
 name: commit
 description: Use when writing a git commit message in the todo_learn repo — commit type/scope conventions, message format, and examples (Conventional Commits, Russian description text).
+allowedTools:
+  - Bash(git *)
 model: sonnet
+effort: low
 ---
 
 # Commit
