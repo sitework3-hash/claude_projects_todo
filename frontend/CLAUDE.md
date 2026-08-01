@@ -12,13 +12,13 @@
 
 ### Слои (сверху вниз по уровню абстракции)
 
-| Слой         | Каталог             | Назначение                                                        |
-| ------------ | -------------------- | ------------------------------------------------------------------ |
-| `app`        | `src/app`           | Роутинг Next.js, провайдеры, глобальные стили. **Только тонкий вход.** |
-| `views`      | `src/views`         | Композиция страницы целиком (аналог слоя `pages` в каноничном FSD). |
-| `features`   | `src/features`      | Действия пользователя с бизнес-ценностью (логин, регистрация, создание транзакции). |
-| `entities`   | `src/entities`      | Бизнес-сущности (сессия, категория, транзакция).                  |
-| `shared`     | `src/shared`        | Переиспользуемый код без привязки к домену (UI-кит, api, config, lib). |
+| Слой       | Каталог        | Назначение                                                                          |
+| ---------- | -------------- | ----------------------------------------------------------------------------------- |
+| `app`      | `src/app`      | Роутинг Next.js, провайдеры, глобальные стили. **Только тонкий вход.**              |
+| `views`    | `src/views`    | Композиция страницы целиком (аналог слоя `pages` в каноничном FSD).                 |
+| `features` | `src/features` | Действия пользователя с бизнес-ценностью (логин, регистрация, создание транзакции). |
+| `entities` | `src/entities` | Бизнес-сущности (сессия, категория, транзакция).                                    |
+| `shared`   | `src/shared`   | Переиспользуемый код без привязки к домену (UI-кит, api, config, lib).              |
 
 > Слой `pages` переименован в `views`, потому что `pages` конфликтует по смыслу с
 > роутером Next.js. Роуты живут в `src/app/**/page.tsx` и лишь импортируют соответствующий
@@ -69,22 +69,26 @@ src/
 │   ├── login/page.tsx           # → LoginView
 │   ├── register/page.tsx        # → RegisterView
 │   ├── transactions/page.tsx    # → TransactionsView
-│   └── categories/page.tsx      # → заглушка «раздел в разработке»
+│   └── categories/page.tsx      # → CategoriesView
 ├── views/
 │   ├── dashboard/                # DashboardView (итоги, последние транзакции, навигация)
 │   ├── login/                    # LoginView (Card + LoginForm)
 │   ├── register/                 # RegisterView
-│   └── transactions/              # TransactionsView (итоги + форма + список + фильтр)
+│   ├── transactions/              # TransactionsView (итоги + форма + список + фильтр)
+│   └── categories/                # CategoriesView (форма + список, правка/удаление инлайн)
 ├── features/
 │   ├── auth/
 │   │   ├── login/                # ui/model(schema)/api
 │   │   └── register/
 │   ├── navigation/                # NavMenu
+│   ├── category/
+│   │   ├── create/                # CategoryCreateForm
+│   │   └── edit/                  # CategoryEditForm (инлайн-правка строки списка)
 │   └── transaction/
 │       └── create/                # TransactionForm (селект категорий)
 ├── entities/
 │   ├── session/                   # хранение токена (localStorage) + React-контекст
-│   ├── category/                  # тип Category + getCategories()
+│   ├── category/                  # тип + CRUD-API + zod-схема + config (цвета/иконки) + UI
 │   └── transaction/                # типы + get/create/get-latest API + lib (пагинация) + TransactionItem
 └── shared/
     ├── ui/                        # shadcn-компоненты
@@ -117,6 +121,24 @@ Backend отдаёт `{ accessToken, user: { id, name, email } }` для `POST /
 дописывается в конец — это важно из-за React StrictMode, который в dev вызывает
 эффекты дважды: если бы первая страница всегда дописывалась, она задваивалась бы при
 каждом маунте. При `offset > 0` (подгрузка через `loadMore`) — дописывается в конец.
+
+## Категории
+
+Общий код двух feature-слайсов (`category/create` и `category/edit`) лежит в
+`entities/category`, а не в одном из них: слайсы одного слоя не имеют права
+импортировать друг друга. Туда вынесены zod-схема формы (`model/schema.ts`),
+палитра цветов и набор иконок (`config/appearance.ts`) и общий
+`CategoryAppearancePicker`.
+
+- **Иконка хранится как имя** (строка в БД), поэтому набор фиксирован —
+  `CATEGORY_ICONS`. Рендерить произвольное имя пришлось бы динамическим импортом
+  всей библиотеки lucide.
+- **Цвет выбирается кнопками палитры**, а не `<input type="color">`: backend
+  валидирует hex из 6 знаков, а готовый набор значений заведомо ему соответствует.
+  Повторный клик снимает выбор — это `null` («без цвета»).
+- **`null` против `undefined`**: в `PATCH` `null` означает сброс оформления
+  (`@IsOptional()` пропускает его, Prisma пишет NULL), а при создании
+  «не выбрано» отправляется как `undefined` — поле просто не уходит в теле.
 
 ## Команды (только frontend)
 
