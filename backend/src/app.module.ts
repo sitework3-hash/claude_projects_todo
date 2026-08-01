@@ -10,7 +10,9 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    // envFilePath задан явно: nest start запускается с cwd=backend/, а .env лежит
+    // в корне монорепо — без этого JWT_SECRET не находится и JwtStrategy падает.
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../.env', '.env'] }),
     CqrsModule.forRoot(),
     UsersModule,
     AuthModule,
