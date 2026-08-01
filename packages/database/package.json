@@ -6,9 +6,10 @@
   "types": "index.ts",
   "scripts": {
     "generate": "prisma generate",
-    "migrate": "prisma migrate dev",
-    "migrate:deploy": "prisma migrate deploy",
-    "studio": "prisma studio",
+    "migrate": "set -a; [ -f ../../.env ] && . ../../.env; set +a; prisma migrate dev",
+    "migrate:deploy": "set -a; [ -f ../../.env ] && . ../../.env; set +a; prisma migrate deploy",
+    "migrate:status": "set -a; [ -f ../../.env ] && . ../../.env; set +a; prisma migrate status",
+    "studio": "set -a; [ -f ../../.env ] && . ../../.env; set +a; prisma studio",
     "format": "prisma format"
   },
   "dependencies": {

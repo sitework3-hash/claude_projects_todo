@@ -18,6 +18,7 @@
     "format:check": "prettier --check .",
     "db:generate": "npm run generate -w @todo-learn/database",
     "db:migrate": "npm run migrate -w @todo-learn/database",
+    "db:migrate:status": "npm run migrate:status -w @todo-learn/database",
     "db:studio": "npm run studio -w @todo-learn/database"
   },
   "engines": {
