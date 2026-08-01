@@ -9,6 +9,15 @@
 дополнительно, когда Claude Code работает внутри соответствующей директории — так контекст
 не раздувается архитектурными деталями чужого слоя.
 
+## С чего начать
+
+`docs/ONBOARDING.md` — что за проект, карта репозитория, модель данных, проверенный
+запуск, смоук-проверки, известные грабли и что ещё не реализовано. Читать его вместо
+того, чтобы восстанавливать картину по коду.
+
+Запуск приложения — скилл `run-app` (`/run-app`): поднимает БД, backend и frontend и
+прогоняет проверку авторизации и транзакций.
+
 ## Memory
 
 Memory для этого проекта хранится локально в `.claude/memory/` (gitignored), а не в
@@ -29,9 +38,15 @@ npm run build           # сборка backend + frontend
 npm run lint             # ESLint по всему репо
 npm run format           # Prettier
 npm run db:generate     # Prisma client
-npm run db:migrate      # Prisma migrate
+npm run db:migrate      # Prisma migrate (dev; на базе с данными — осознанно)
+npm run db:migrate:status  # состояние миграций, без изменений
 npm run db:studio       # Prisma Studio
 ```
+
+`.env` лежит в корне монорепо, а процессы стартуют из своих рабочих директорий:
+Nest получает путь явно (`envFilePath` в `backend/src/app.module.ts`), Prisma —
+через обёртку в скриптах `packages/database/package.json`. Новые скрипты, которым
+нужен `DATABASE_URL`, оборачивать так же.
 
 ## Соглашение о коммитах
 
@@ -91,6 +106,7 @@ gh pr create --web
 ```
 
 Шаблон описания PR:
+
 - **Summary** — что реализовано, какие endpoints добавлены
 - **Backend** — новые маршруты, DTO, хендлеры
 - **Frontend** — новые view/feature/entity, изменения в архитектуре
